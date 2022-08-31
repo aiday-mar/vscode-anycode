@@ -20,6 +20,7 @@ export class DocumentSymbols {
 		connection.onRequest(lsp.DocumentSymbolRequest.type, this.provideDocumentSymbols.bind(this));
 	}
 
+	// Returns an array of lsp DocumentSymbols
 	async provideDocumentSymbols(params: lsp.DocumentSymbolParams): Promise<lsp.DocumentSymbol[]> {
 		const document = await this._documents.retrieve(params.textDocument.uri);
 		return getDocumentSymbols(document, this._trees, false);
@@ -28,18 +29,22 @@ export class DocumentSymbols {
 
 export function getDocumentSymbols(document: TextDocument, trees: Trees, flat: boolean): lsp.DocumentSymbol[] {
 
+	// Node type defined only within the context of this function
 	class Node {
 		readonly range: lsp.Range;
 		readonly children: Node[] = [];
+		// QueryCapture comes from the web-tree-sitter library 
 		constructor(readonly capture: QueryCapture) {
 			this.range = asLspRange(capture.node);
 		}
 	}
 
+	// get the tree corresponding to the specific document
 	const tree = trees.getParseTree(document);
 	if (!tree) {
 		return [];
 	}
+	// The possible languages are obtained from the ones covered by anycode
 	const query = Languages.getQuery(document.languageId, 'outline');
 	const captures = query.captures(tree.rootNode);
 
