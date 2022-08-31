@@ -64,6 +64,7 @@ function readAnycodeExtension(candidate) {
 	}
 	const bucket = []
 
+	// For all possible languages in the data variable
 	for (let lang of languages) {
 		let queries = {};
 		for (let prop in lang.queryPaths) {
