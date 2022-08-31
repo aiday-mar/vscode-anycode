@@ -23,14 +23,17 @@ export class WorkspaceSymbol {
 		connection.onRequest(lsp.WorkspaceSymbolResolveRequest.type, this.resolveWorkspaceSymbol.bind(this));
 	}
 
+	// Custom type improted from the vscode language server library 
 	async provideWorkspaceSymbols(params: lsp.WorkspaceSymbolParams): Promise<lsp.WorkspaceSymbol[]> {
 		const result: lsp.WorkspaceSymbol[] = [];
 
 		await Promise.race([
+			// Calling the update function on the SymbolIndex
 			this._symbols.update(),
 			new Promise(resolve => setTimeout(resolve, 250))
 		]);
 
+		// WorkspaceSymbolParams contains the query of interest
 		const all = this._symbols.index.query(params.query);
 
 		out: for (const [name, map] of all) {
@@ -53,6 +56,7 @@ export class WorkspaceSymbol {
 		const symbols = getDocumentSymbols(document, this._trees, true);
 		for (let candidate of symbols) {
 			if (candidate.name === item.name && candidate.kind === item.kind) {
+				// lsp contains SymbolInformation and DocumentSymbol as possible types
 				return lsp.SymbolInformation.create(item.name, item.kind, candidate.selectionRange, item.location.uri);
 			}
 		}
