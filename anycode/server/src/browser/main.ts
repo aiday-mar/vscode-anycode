@@ -13,6 +13,7 @@ const messageWriter = new BrowserMessageWriter(self);
 
 const connection = createConnection(messageReader, messageWriter);
 
+// call the create function from the factory variable
 const factory: IStorageFactory = {
 	async create(name) {
 		try {
